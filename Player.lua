@@ -1,7 +1,9 @@
 local class = require "middleclass"
 
-local BulletManager = require "BulletManager"
+local InstanceManager = require "InstanceManager"
 local Bullet = require "Bullet"
+
+local globals = require "globals"
 
 local lg, lp = love.graphics, love.physics
 local ww, wh = lg.getWidth(), lg.getHeight()
@@ -15,6 +17,10 @@ function Player:initialize(world, x, y)
   self.body = lp.newBody(world, x, y, "kinematic")
   self.shape = lp.newPolygonShape(  -prx,pry,  prx,pry,  0,-pry,  -prx,-pry  )
   self.fixture = lp.newFixture(self.body, self.shape)
+
+  self.fixture:setFilterData(1,1,0)
+  self.fixture:setUserData(self)
+
   self.dx, self.dy = 0, 0
 end
 
@@ -23,7 +29,7 @@ function Player:draw()
   lg.polygon("fill", self.body:getWorldPoints(self.shape:getPoints()))
 end
 
-function clamp(min, x, max)
+local function clamp(min, x, max)
   return x < min and min or (x > max and max or x)
 end
 
@@ -42,8 +48,12 @@ function Player:setYVelocity(dy)
   self.dy = speed * dy
 end
 
-function Player:shoot(world)
-  BulletManager.add(Bullet(world, self.body:getX() + prx, self.body:getY() + pry, bulletSpeed, 0))
+function Player:damage(amount)
+  print(self, amount)
+end
+
+function Player:shoot()
+  InstanceManager.add(Bullet(globals.world, 2, self.body:getX() + prx, self.body:getY() + pry, bulletSpeed, 0))
 end
 
 return Player

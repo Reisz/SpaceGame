@@ -1,32 +1,39 @@
 local Player = require "Player"
 local Enemy = require "Enemy"
-local BulletManager = require "BulletManager"
-local Bullet = require "Bullet"
+local InstanceManager = require "InstanceManager"
 
-local world
+local globals = require "globals"
+
 local player
-local enemy
 
 function love.load()
+  print("Love version: " .. love._version_major .. "." .. love._version_minor .. "." .. love._version_revision)
   love.graphics.setBackgroundColor(255, 255, 255)
-  
-  world = love.physics.newWorld(0, 0, true)
-  player = Player(world, 50, 50)
-  enemy = Enemy(world, 650, 400)
-  
-  BulletManager.add(Bullet(world, 100, 100, 100, 0))
+
+  globals.world = love.physics.newWorld(0, 0, true)
+  require "physics"(globals.world)
+
+  player = Player(globals.world, 50, 50)
+  InstanceManager.add(Enemy(globals.world, 650, 400))
 end
 
 function love.draw()
+  InstanceManager:draw()
   player:draw()
-  enemy:draw()
-  BulletManager:draw()
 end
 
 function love.update(dt)
-  world:update(dt)
-  BulletManager.update(dt)
+  globals.world:update(dt)
+  InstanceManager.update(dt)
   player:update(dt)
+end
+
+local spaceConstant
+if love._version_minor < 9 or
+  (love._version_minor == 9 and love._version_revision <= 2) then
+  spaceConstant = " "
+else
+  spaceConstant = "space"
 end
 
 function love.keypressed(key)
@@ -38,12 +45,12 @@ function love.keypressed(key)
     player:setXVelocity(-1)
   elseif key == "right" then
     player:setXVelocity(1)
-    
-  elseif key == " " then
-    player:shoot(world)
-    
+
+  elseif key == spaceConstant then
+    player:shoot()
+
   elseif key == "0" then
-    print(#BulletManager.instances)
+    print(#InstanceManager.instances)
   end
 end
 
