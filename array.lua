@@ -1,4 +1,16 @@
 --- Functions for the array part of tables.
+-- @use
+-- ```lua
+-- function flatten(tbl)
+--   return array.reduce(tbl, function(a,v)
+--     if type(v) == "table" then
+--       return array.join(a, flatten(v))
+--     else
+--       return array.append(a, v)
+--     end
+--   end, {})
+-- end
+-- ```
 
 local array = {}
 
@@ -100,7 +112,7 @@ end
 --
 --   Return values are written back to the array. See the main description about
 --   returning `nil` from the callback.
--- @return tbl
+-- @return `tbl`
 function array.map(tbl, callback)
   for index = 1, #tbl do
     tbl[index] = callback(tbl[index], index, tbl)
@@ -125,7 +137,18 @@ function array.reduce(tbl, callback, init)
 end
 
 function array.reduceRight(tbl, callback, init)
-  print(tbl, callback, init)
+  local start, accumulator = #tbl
+  if type(init) ~= "nil" then
+    accumulator = init
+  else
+    start, accumulator = start - 1, tbl[start]
+  end
+  
+  for index = start, 1, -1 do
+    accumulator = callback(accumulator, tbl[index], index, tbl)
+  end
+  
+  return accumulator
 end
 
 --- Join multiple arrays into a single big array.
@@ -136,9 +159,9 @@ end
 -- `array.join(a, a, a)` will not behave as expected. If the first argument
 -- appears again anywhere but in the second argument, consider calling this
 -- function as `a = array.join({}, a, a, a)`.
--- @tparam table tbl table to be written to
--- @tparam[opt] table ... tables to append to the end of tbl
--- @return tbl
+-- @tparam table tbl The array to be written to.
+-- @tparam[opt] table ... The arrays to append to the end of tbl.
+-- @return `tbl`
 function array.join(tbl, ...)
   local last = #tbl
 
@@ -155,5 +178,22 @@ function array.join(tbl, ...)
 
   return tbl
 end
+
+--- Append multiple elements to the end of an array.
+-- Ths will append each of its argument from the second onward to the end of the
+-- array passed as the first argument.
+-- @tparam table tbl The array to be written to.
+-- @param[opt] ... The elements to be added to the end of `tbl`.
+-- @return `tbl`
+function array.append(tbl, ...)
+  local last = #tbl
+
+  for index = 1, select('#', ...) do
+    tbl[last + index] = select(index, ...)
+  end
+
+  return tbl
+end
+  
 
 return array
