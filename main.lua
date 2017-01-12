@@ -3,6 +3,7 @@ local Enemy = require "Enemy"
 local InstanceManager = require "InstanceManager"
 
 local globals = require "globals"
+local lk = love.keyboard
 
 local player
 
@@ -36,19 +37,20 @@ else
   spaceConstant = "space"
 end
 
+local function updateVelocity(key)
+  if key == "up" or key == "down" or key == "left" or key == "right" then
+    player:setVelocity(
+      (lk.isDown("left") and -1 or 0) + (lk.isDown("right") and 1 or 0),
+      (lk.isDown("up"  ) and -1 or 0) + (lk.isDown("down" ) and 1 or 0)
+    )
+  end
+end
+
 function love.keypressed(key)
-  if key == "up" then
-    player:setYVelocity(-1)
-  elseif key == "down" then
-    player:setYVelocity(1)
-  elseif key == "left" then
-    player:setXVelocity(-1)
-  elseif key == "right" then
-    player:setXVelocity(1)
+  updateVelocity(key)
 
-  elseif key == spaceConstant then
+  if key == spaceConstant then
     player:shoot()
-
   elseif key == "0" then
     print(#InstanceManager.instances)
   end
@@ -56,13 +58,5 @@ end
 
 
 function love.keyreleased(key)
-  if key == "up" and not love.keyboard.isDown("down") then
-    player:setYVelocity(0)
-  elseif key == "down" and not love.keyboard.isDown("up") then
-    player:setYVelocity(0)
-  elseif key == "left" and not love.keyboard.isDown("right") then
-    player:setXVelocity(0)
-  elseif key == "right" and not love.keyboard.isDown("left") then
-    player:setXVelocity(0)
-  end
+  updateVelocity(key)
 end

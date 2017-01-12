@@ -40,12 +40,8 @@ function Player:update(dt)
   )
 end
 
-function Player:setXVelocity(dx)
-  self.dx = speed * dx
-end
-
-function Player:setYVelocity(dy)
-  self.dy = speed * dy
+function Player:setVelocity(dx, dy)
+  self.dx, self.dy = speed * dx, speed * dy
 end
 
 function Player:damage(amount)
