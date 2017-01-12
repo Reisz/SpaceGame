@@ -5,10 +5,11 @@ local br = 3
 
 local Bullet = class("Bullet")
 
+Bullet.static.shape = lp.newCircleShape(br)
+
 function Bullet:initialize(world, cat, x, y, dx, dy)
   self.body = lp.newBody(world, x, y, "dynamic")
-  self.shape = lp.newCircleShape(br)
-  self.fixture = lp.newFixture(self.body, self.shape)
+  self.fixture = lp.newFixture(self.body, self.class.shape)
 
   self.fixture:setFilterData(cat, cat, 0)
   self.fixture:setUserData(self)

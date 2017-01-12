@@ -121,6 +121,8 @@ function array.map(tbl, callback)
   return tbl
 end
 
+--- Apply a function against an accumulator and each element of an array from
+-- lowest to highest index.
 function array.reduce(tbl, callback, init)
   local start, accumulator
   if type(init) ~= "nil" then
@@ -136,6 +138,8 @@ function array.reduce(tbl, callback, init)
   return accumulator
 end
 
+--- Apply a function against an accumulator and each element of an array from
+-- highest to lowest index.
 function array.reduceRight(tbl, callback, init)
   local start, accumulator = #tbl
   if type(init) ~= "nil" then

@@ -1,5 +1,6 @@
 local Player = require "Player"
 local Enemy = require "Enemy"
+local FastEnemy = require "FastEnemy"
 local InstanceManager = require "InstanceManager"
 
 local globals = require "globals"
@@ -16,6 +17,7 @@ function love.load()
 
   player = Player(globals.world, 50, 50)
   InstanceManager.add(Enemy(globals.world, 650, 400))
+  InstanceManager.add(FastEnemy(globals.world, 650, 200))
 end
 
 function love.draw()
