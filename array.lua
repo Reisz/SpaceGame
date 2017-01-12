@@ -3,27 +3,44 @@
 local array = {}
 
 --- Filter an array using a function.
--- Traverse the array while removing certain elements depending on the value
--- that was returned by the passed filter funciton. This function will make sure
--- to read each index exactly once.
+-- Traverse the array while removing or changing elements depending on the value
+-- that was returned by the passed filter callback. This method will read each
+-- index exactly once.
+--
+-- @{array.filter} will make shure to shift all remaining elements into possibly
+-- freed spaces, so no additional holes will be created.
 --
 -- To execute a function on each element without changing the structure of the
--- array, @{\\array.forEach} will present a better alternative.
--- @tparam table tbl table to be filtered
--- @tparam function callback filter function.
---   Return true to leave in, return false to sort out.
--- @return tbl
+-- array, neither @{array.map} nor @{array.forEach} include code to fix holes
+-- during traversal, wich will increase execution speed for those cases.
+-- @tparam table tbl The array to be filtered.
+-- @tparam function callback Function to execute for each element in the array.
+--   Will take three parameters:
+--
+--   **value**
+--   > The current element being processed in the array.
+--   **index**
+--   > The index of the current element being processed in the array.
+--   **tbl**
+--   > The array `filter` was called upon.
+--
+--   Return the original value to keep the entry, a new value to change the
+--   entry, or `nil` to remove the entry from the array.
+-- @return `tbl`
 function array.filter(tbl, callback)
   local offset = 0
 
   for index = 1, #tbl do
-    local value = tbl[index]
-    if not callback(value, index, tbl) then
+    local oldVal = tbl[index]
+    local value = callback(oldVal, index, tbl)
+    if type(value) == "nil" then
       tbl[index] = nil
       offset = offset + 1
     elseif offset > 0 then
       tbl[index] = nil
       tbl[index - offset] = value
+    elseif oldVal ~= value then
+      tbl[index] = value
     end
   end
 
@@ -32,11 +49,25 @@ end
 
 --- Execute a function on each element of an array.
 -- This funtion will execute a function on each element of an array, without
--- modifiying its content. This is the fastest of the traversal functions.
--- @tparam table tbl table to be traversed
--- @tparam function callback function to apply.
+-- modifiying its content. This is the fastest of the traversal functions and
+-- will read each index exactly once.
+--
+-- To modify the contents of an array without removing elements, see
+-- @{array.map}. To be able remove and modify elements of an array, use
+-- @{array.filter}.
+-- @tparam table tbl The array to be traversed.
+-- @tparam function callback Function to execute for each element in the array.
+--   Will take three parameters:
+--
+--   **value**
+--   > The current element being processed in the array.
+--   **index**
+--   > The index of the current element being processed in the array.
+--   **tbl**
+--   > The array `filter` was called upon.
+--
 --   Return values are ignored.
--- @return tbl
+-- @return `tbl`
 function array.forEach(tbl, callback)
   for index = 1, #tbl do
     callback(tbl[index], index, tbl)
@@ -46,8 +77,29 @@ function array.forEach(tbl, callback)
 end
 
 --- Apply a function to each element of an array.
+-- Traverse an array while changing the value of the element depending on the
+-- value that was returned by the passed map callback. This method will read
+-- each index exactly once.
+--
+-- Be careful when returning `nil` in the callback function, as this behaviour
+-- will introduce holes in your array. To be able to pass `nil` in order to
+-- signal removal, use @{array.filter} instead.
+--
+-- To simply execute a function without changing the content of the array,
+-- @{array.forEach} will be sligtly faster.
 -- @tparam table tbl table to be traversed
--- @tparam function callback callback function to apply.
+-- @tparam function callback Function to execute for each element in the array.
+--   Will take three parameters:
+--
+--   **value**
+--   > The current element being processed in the array.
+--   **index**
+--   > The index of the current element being processed in the array.
+--   **tbl**
+--   > The array `filter` was called upon.
+--
+--   Return values are written back to the array. See the main description about
+--   returning `nil` from the callback.
 -- @return tbl
 function array.map(tbl, callback)
   for index = 1, #tbl do
@@ -58,7 +110,18 @@ function array.map(tbl, callback)
 end
 
 function array.reduce(tbl, callback, init)
-  print(tbl, callback, init)
+  local start, accumulator
+  if type(init) ~= "nil" then
+    start, accumulator = 1, init
+  else
+    start, accumulator = 2, tbl[1]
+  end
+  
+  for index = start, #tbl do
+    accumulator = callback(accumulator, tbl[index], index, tbl)
+  end
+  
+  return accumulator
 end
 
 function array.reduceRight(tbl, callback, init)
@@ -70,9 +133,9 @@ end
 -- first array.
 --
 -- As this function will mutate its first argument, a call like
--- `@{array.join}(a, a, a)` will not behave as expected. If the first argument
+-- `array.join(a, a, a)` will not behave as expected. If the first argument
 -- appears again anywhere but in the second argument, consider calling this
--- function as `a = @{array.join}({}, a, a, a)`.
+-- function as `a = array.join({}, a, a, a)`.
 -- @tparam table tbl table to be written to
 -- @tparam[opt] table ... tables to append to the end of tbl
 -- @return tbl

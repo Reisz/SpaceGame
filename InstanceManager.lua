@@ -22,10 +22,10 @@ function InstanceManager.static.update(dt)
     then
       v.fixture:destroy()
       v.body:destroy()
-      return false
+      return nil
     end
 
-    return true
+    return v
   end)
 end
 
