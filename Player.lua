@@ -9,7 +9,7 @@ local lg, lp = love.graphics, love.physics
 local ww, wh = lg.getWidth(), lg.getHeight()
 local pw, ph = 40, 20
 local prx, pry = pw / 2, ph / 2
-local speed, bulletSpeed = 100, 150
+local speed, bulletSpeed = 100, 400
 
 local Player = class("Player")
 

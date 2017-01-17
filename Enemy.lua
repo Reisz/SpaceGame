@@ -14,7 +14,7 @@ local Enemy = class("Enemy")
 Enemy.static.shape = lp.newPolygonShape(  erx,ery,  -eh,ery,  -erx,-ery,  eh,-ery  )
 Enemy.static.shootRate = 1.5
 Enemy.static.bulletSpeed = 120
-Enemy.static.maxHealth = 100
+Enemy.static.maxHealth = 30
 Enemy.static.speed = 35
 
 function Enemy:initialize(world, x, y)

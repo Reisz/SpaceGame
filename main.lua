@@ -1,12 +1,14 @@
 local Player = require "Player"
 local Enemy = require "Enemy"
-local FastEnemy = require "FastEnemy"
+
 local InstanceManager = require "InstanceManager"
+local EnemySpawner = require "EnemySpawner"
 
 local globals = require "globals"
 local lk = love.keyboard
 
 local player
+local spawner
 
 function love.load()
   print("Love version: " .. love._version_major .. "." .. love._version_minor .. "." .. love._version_revision)
@@ -16,8 +18,7 @@ function love.load()
   require "physics"(globals.world)
 
   player = Player(globals.world, 50, 50)
-  InstanceManager.add(Enemy(globals.world, 650, 400))
-  InstanceManager.add(FastEnemy(globals.world, 650, 200))
+  spawner = EnemySpawner(globals.world)
 end
 
 function love.draw()
@@ -28,6 +29,7 @@ end
 function love.update(dt)
   globals.world:update(dt)
   InstanceManager.update(dt)
+  spawner.update(dt)
   player:update(dt)
 end
 

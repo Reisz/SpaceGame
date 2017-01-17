@@ -9,5 +9,6 @@ local FastEnemy = class("FastEnemy", Enemy)
 
 FastEnemy.static.shape = love.physics.newPolygonShape(  -erx,0,  erx,-ery,  0,0,  erx,ery  )
 FastEnemy.static.speed = 50
+FastEnemy.static.maxHealth = 20
 
 return FastEnemy
