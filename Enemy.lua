@@ -63,18 +63,15 @@ function Enemy:damage(amount)
 end
 
 function Enemy:draw()
-  lg.setColor(255,127,0, self.health == 0 and 128 or 255)
+  lg.setColor(255,127,0)
   lg.polygon("fill", self.body:getWorldPoints(self.class.shape:getPoints()))
 
   local ht = self.healthTimer
   if ht > 0 then
     local x1, x2, x3, x4, y, a
     local h, dh, mw = self.health, self.displayHealth, hw / self.class.maxHealth
-    y = self.body:getY() - ery - hpad
-    x1 = self.body:getX() - erx + hpad
-    x4 = x1 + hw
-    x2 = x1 + (mw * h)
-    x3 = x1 + (mw * dh)
+    x1, y = self.body:getX() - erx + hpad, self.body:getY() - ery - hpad
+    x2, x3, x4 = x1 + (mw * h), x1 + (mw * dh), x1 + hw
     a = ht < healthFade and 255 * ht / healthFade or 255
 
     lg.push()
