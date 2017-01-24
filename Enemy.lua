@@ -8,6 +8,8 @@ local globals = require "globals"
 local lg, lp = love.graphics, love.physics
 local ew, eh = 40, 15
 local erx, ery = ew / 2, eh / 2
+local hpad = 5
+local hw = ew - 2 * hpad
 
 local Enemy = class("Enemy")
 
@@ -48,6 +50,20 @@ end
 function Enemy:draw()
   lg.setColor(255,127,0)
   lg.polygon("fill", self.body:getWorldPoints(self.class.shape:getPoints()))
+  
+  local x1, x2, x3, y
+  y = self.body:getY() - ery - hpad
+  x1 = self.body:getX() - erx + hpad
+  x3 = x1 + hw
+  x2 = x1 + (hw * self.health / self.class.maxHealth)
+  
+  lg.push()
+  lg.setLineWidth(2)
+  lg.setColor(32, 255, 32)
+  lg.line(x1, y, x2, y)
+  lg.setColor(255, 32, 32)
+  lg.line(x2, y, x3, y)
+  lg.pop()
 end
 
 return Enemy

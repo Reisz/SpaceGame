@@ -11,7 +11,7 @@ local currentTimer, delay = 0, 2
 
 local function spawnEnemy()
   InstanceManager.add(enemies[math.random(#enemies)](
-      world, 850, math.random(100,700)
+      world, 850, math.random(100,500)
     ))
 end
 
