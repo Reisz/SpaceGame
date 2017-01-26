@@ -1,6 +1,5 @@
 --- Functions for the array part of tables.
--- @use
--- ```lua
+-- @usage
 -- function flatten(tbl)
 --   return array.reduce(tbl, function(a,v)
 --     if type(v) == "table" then
@@ -10,7 +9,6 @@
 --     end
 --   end, {})
 -- end
--- ```
 
 local array = {}
 
@@ -27,21 +25,24 @@ local array = {}
 -- during traversal, wich will increase execution speed for those cases.
 -- @tparam table tbl The array to be filtered.
 -- @tparam function callback Function to execute for each element in the array.
---   Will take three parameters:
 --
---   **value**
---   > The current element being processed in the array.
---   **index**
---   > The index of the current element being processed in the array.
---   **tbl**
---   > The array `filter` was called upon.
+-- Will take three parameters:
 --
---   Return the original value to keep the entry, a new value to change the
---   entry, or `nil` to remove the entry from the array.
+-- **value**
+--> The current element being processed in the array.
+--
+-- **index**
+--> The index of the current element being processed in the array.
+--
+-- **tbl**
+--> The array `filter` was called upon.
+--
+-- Return the original value to keep the entry, a new value to change the
+-- entry, or `nil` to remove the entry from the array.
 -- @return `tbl`
 function array.filter(tbl, callback)
   local offset = 0
-  
+
   for index = 1, #tbl do
     local oldVal = tbl[index]
     local value = callback(oldVal, index, tbl)
@@ -69,16 +70,19 @@ end
 -- @{array.filter}.
 -- @tparam table tbl The array to be traversed.
 -- @tparam function callback Function to execute for each element in the array.
---   Will take three parameters:
 --
---   **value**
---   > The current element being processed in the array.
---   **index**
---   > The index of the current element being processed in the array.
---   **tbl**
---   > The array `filter` was called upon.
+-- Will take three parameters:
 --
---   Return values are ignored.
+-- **value**
+--> The current element being processed in the array.
+--
+-- **index**
+--> The index of the current element being processed in the array.
+--
+-- **tbl**
+--> The array `forEach` was called upon.
+--
+-- Return values are ignored.
 -- @return `tbl`
 function array.forEach(tbl, callback)
   for index = 1, #tbl do
@@ -99,19 +103,22 @@ end
 --
 -- To simply execute a function without changing the content of the array,
 -- @{array.forEach} will be sligtly faster.
--- @tparam table tbl table to be traversed
+-- @tparam table tbl The array to be mapped.
 -- @tparam function callback Function to execute for each element in the array.
---   Will take three parameters:
 --
---   **value**
---   > The current element being processed in the array.
---   **index**
---   > The index of the current element being processed in the array.
---   **tbl**
---   > The array `filter` was called upon.
+-- Will take three parameters:
 --
---   Return values are written back to the array. See the main description about
---   returning `nil` from the callback.
+-- **value**
+--> The current element being processed in the array.
+--
+-- **index**
+--> The index of the current element being processed in the array.
+--
+-- **tbl**
+--> The array `map` was called upon.
+--
+-- Return values are written back to the array. See the main description about
+-- returning `nil` from the callback.
 -- @return `tbl`
 function array.map(tbl, callback)
   for index = 1, #tbl do
@@ -123,6 +130,29 @@ end
 
 --- Apply a function against an accumulator and each element of an array from
 -- lowest to highest index.
+-- @tparam table tbl The array to be reduced.
+-- @tparam function callback Function to execute for each element in the array.
+--
+-- Will take four parameters:
+--
+-- **accumulator**
+--> Initial value or value last returned by callback.
+--
+-- **value**
+--> The current element being processed in the array.
+--
+-- **index**
+--> The index of the current element being processed in the array.
+--
+-- **tbl**
+--> The array `map` was called upon.
+--
+-- The return value is stored in an accumulator for the next invocation of
+-- `callback`.
+-- @param[opt] init Initial value for the accumulator. If omitted, the
+-- accumulator will be set to the value of the first array entry and the first
+-- call to `callback` will be skipped.
+-- @return The accumulator value returned by the last call to `callback`.
 function array.reduce(tbl, callback, init)
   local start, accumulator
   if type(init) ~= "nil" then
@@ -130,16 +160,39 @@ function array.reduce(tbl, callback, init)
   else
     start, accumulator = 2, tbl[1]
   end
-  
+
   for index = start, #tbl do
     accumulator = callback(accumulator, tbl[index], index, tbl)
   end
-  
+
   return accumulator
 end
 
 --- Apply a function against an accumulator and each element of an array from
 -- highest to lowest index.
+-- @tparam table tbl The array to be reduced.
+-- @tparam function callback Function to execute for each element in the array.
+--
+-- Will take four parameters:
+--
+-- **accumulator**
+--> Initial value or value last returned by callback.
+--
+-- **value**
+--> The current element being processed in the array.
+--
+-- **index**
+--> The index of the current element being processed in the array.
+--
+-- **tbl**
+--> The array `map` was called upon.
+--
+-- The return value is stored in an accumulator for the next invocation of
+-- `callback`.
+-- @param[opt] init Initial value for the accumulator. If omitted, the
+-- accumulator will be set to the value of the last array entry and the first
+-- call to `callback` will be skipped.
+-- @return The accumulator value returned by the last call to `callback`.
 function array.reduceRight(tbl, callback, init)
   local start, accumulator = #tbl
   if type(init) ~= "nil" then
@@ -147,11 +200,11 @@ function array.reduceRight(tbl, callback, init)
   else
     start, accumulator = start - 1, tbl[start]
   end
-  
+
   for index = start, 1, -1 do
     accumulator = callback(accumulator, tbl[index], index, tbl)
   end
-  
+
   return accumulator
 end
 
@@ -203,9 +256,8 @@ function array.clear(tbl)
   for index = 1, #tbl do
     tbl[index] = nil
   end
-  
+
   return tbl
 end
-  
 
 return array
